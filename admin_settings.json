@@ -1,0 +1,43 @@
+{
+    "admin": {
+        "username": "bhradmin",
+        "password": "$2y$10$DLan90DOz0juC\/36JchxiOK2KYSOoeNiRj0I7C\/1M3FJYAWWn9uRW",
+        "first_login": true
+    },
+    "db": {
+        "host": "localhost",
+        "name": "job_portal",
+        "user": "root",
+        "pass": "",
+        "charset": "utf8mb4"
+    },
+    "api_key": "CHANGE_ME_API_KEY",
+    "hf_token": "",
+    "razorpay": {
+        "key_id": "",
+        "key_secret": "",
+        "webhook_secret": ""
+    },
+    "token_costs_ai": {
+        "search": 150,
+        "unmask_email": 25,
+        "unmask_mobile": 50,
+        "download_profile": 100
+    },
+    "token_costs_normal": {
+        "search": 50,
+        "unmask_email": 15,
+        "unmask_mobile": 30,
+        "download_profile": 75
+    },
+    "initial_tokens": 500,
+    "free_tier": {
+        "daily_unmasks": 3,
+        "daily_downloads": 1
+    },
+    "curl_insecure_internal": true,
+    "curl_insecure_external": true,
+    "site": {
+        "force_http": true
+    }
+}
