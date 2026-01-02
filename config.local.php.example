@@ -1,0 +1,16 @@
+<?php
+/**
+ * Optional local overrides.
+ * Copy to config.local.php and fill in your DB details.
+ * This file is read by api/config.php and merged over admin settings/defaults.
+ */
+return [
+  'db' => [
+    'host' => '<DB_HOST>',
+    'name' => '<DB_NAME>',
+    'user' => '<DB_USER>',
+    'pass' => '<DB_PASS>',
+    'charset' => 'utf8mb4',
+  ],
+  // 'api_key' => '<SET_A_RANDOM_API_KEY>',
+];
