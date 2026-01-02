@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employer Dashboard - Healthcare Job Portal</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <style>
+    .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 2rem 1rem; }
+    .dashboard-header { background: linear-gradient(135deg, #0369a1, #059669); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .dashboard-header h1 { margin-bottom: 0.5rem; font-size: 2rem; }
+    .user-info { opacity: 0.95; font-size: 0.95rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid var(--primary-color); transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .stat-card h3 { color: var(--text-gray); font-size: 0.875rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary-color); }
+    .section-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 2rem; }
+    .section-card h2 { color: var(--primary-color); margin-bottom: 1.5rem; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .search-mode-toggle { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 8px; margin-bottom: 1.5rem; }
+    .toggle-switch { position: relative; display: inline-block; width: 60px; height: 30px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; border-radius: 30px; transition: 0.3s; }
+    .toggle-slider:before { position: absolute; content: ''; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; border-radius: 50%; transition: 0.3s; }
+    input:checked + .toggle-slider { background-color: var(--primary-color); }
+    input:checked + .toggle-slider:before { transform: translateX(30px); }
+    .toggle-label { font-weight: 600; color: var(--text-dark); }
+    .toggle-label.active { color: var(--primary-color); }
+    .cost-info { font-size: 0.875rem; color: var(--text-gray); margin-left: auto; padding: 0.5rem 1rem; background: white; border-radius: 6px; }
+    .cost-info strong { color: var(--primary-color); }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    .form-input, .form-textarea { width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem; transition: border-color 0.3s; }
+    .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1); }
+    .form-textarea { min-height: 120px; resize: vertical; grid-column: 1 / -1; }
+    .job-item { background: #f9fafb; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid var(--secondary-color); transition: all 0.2s; }
+    .job-item:hover { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .job-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+    .job-title { font-size: 1.125rem; font-weight: 600; color: var(--primary-color); margin-bottom: 0.5rem; }
+    .job-meta { color: var(--text-gray); font-size: 0.875rem; }
+    .job-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+    .search-results { margin-top: 1.5rem; max-height: 600px; overflow-y: auto; }
+    .candidate-card { background: #f9fafb; padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid var(--primary-color); }
+    .candidate-card:hover { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-gray); }
+    .empty-state svg { width: 64px; height: 64px; margin-bottom: 1rem; opacity: 0.3; }
+    @media (max-width: 768px) {
+      .dashboard-header h1 { font-size: 1.5rem; }
+      .stats-row { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .job-header { flex-direction: column; }
+      .search-mode-toggle { flex-direction: column; align-items: flex-start; }
+      .cost-info { margin-left: 0; margin-top: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <div class="logo">🏥 HealthCare Jobs</div>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="admin-dashboard.html">⚙️ Admin</a></li>
+          <li><a href="#" id="logoutBtn">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>👋 Welcome Back, Employer</h1>
+      <p class="user-info" id="meLine"></p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <h3>Token Balance</h3>
+        <div class="stat-value" id="tokenBalance">—</div>
+        <button class="btn btn-sm btn-secondary" id="refreshTokensBtn" style="margin-top: 1rem;">🔄 Refresh</button>
+      </div>
+      <div class="stat-card" style="border-left-color: var(--secondary-color);">
+        <h3>Active Jobs</h3>
+        <div class="stat-value" id="activeJobsCount">0</div>
+      </div>
+      <div class="stat-card" style="border-left-color: var(--warning-color);">
+        <h3>Total Applications</h3>
+        <div class="stat-value" id="totalApplicationsCount">0</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>🔍 Candidate Search</h2>
+      
+      <div class="search-mode-toggle">
+        <span class="toggle-label" id="normalLabel">Normal Search</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="searchModeToggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label active" id="aiLabel">AI Search</span>
+        <div class="cost-info" id="searchCostInfo">
+          <strong>150</strong> tokens per search
+        </div>
+      </div>
+
+      <form id="searchForm">
+        <div style="display: flex; gap: 1rem;">
+          <input class="form-input" id="searchQuery" placeholder="e.g. React developer, 3 years, Chennai" style="flex: 1;" />
+          <button class="btn btn-primary" type="submit">🔍 Search</button>
+        </div>
+      </form>
+      
+      <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <div class="section-card">
+      <h2>➕ Post a Job</h2>
+      <form id="jobForm">
+        <div class="form-grid">
+          <input class="form-input" name="title" placeholder="Job title" required />
+          <input class="form-input" name="location" placeholder="Location" required />
+          <input class="form-input" name="skills" placeholder="Skills (comma separated)" />
+          <input class="form-input" name="job_type" placeholder="Job type (full-time/contract)" />
+          <input class="form-input" name="experience_min" type="number" placeholder="Min experience (years)" />
+          <input class="form-input" name="experience_max" type="number" placeholder="Max experience (years)" />
+          <input class="form-input" name="salary_min" type="number" placeholder="Min salary" />
+          <input class="form-input" name="salary_max" type="number" placeholder="Max salary" />
+          <textarea class="form-textarea" name="description" placeholder="Job description" required></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit" style="margin-top: 1rem;">✨ Create Job</button>
+      </form>
+    </div>
+
+    <div class="section-card">
+      <h2>📋 My Jobs</h2>
+      <button class="btn btn-secondary btn-sm" id="refreshJobsBtn">🔄 Refresh</button>
+      <div id="jobsList" style="margin-top: 1.5rem;"></div>
+    </div>
+
+    <div class="section-card">
+      <h2>📬 Applications for Selected Job</h2>
+      <p style="color: var(--text-gray); margin-top: 0.5rem;">Select a job from "My Jobs" to load applications.</p>
+      <div id="applicationsList" style="margin-top: 1.5rem;"></div>
+    </div>
+  </main>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/employer-dashboard.js"></script>
+</body>
+</html>

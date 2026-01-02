@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperAdmin Dashboard - Healthcare & Academicians AI Job Portal</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        .admin-container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .config-section { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .config-section h3 { color: #0369a1; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .config-item { display: flex; flex-direction: column; }
+        .config-item label { font-weight: 600; margin-bottom: 0.5rem; color: #374151; font-size: 0.875rem; }
+        .config-item input, .config-item select { padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; }
+        .config-item input:focus { outline: none; border-color: #0369a1; box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1); }
+        .save-btn { background: linear-gradient(135deg, #0369a1, #059669); color: white; padding: 0.75rem 2rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+        .save-btn:hover { transform: translateY(-2px); }
+        .test-btn { background: #f59e0b; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; margin-left: 0.5rem; }
+        .section-icon { font-size: 1.5rem; }
+        .password-change-section { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+        .danger-zone { background: linear-gradient(135deg, #fee2e2, #fecaca); border: 2px solid #ef4444; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: linear-gradient(135deg, #0369a1, #0284c7); color: white; padding: 1.5rem; border-radius: 12px; text-align: center; }
+        .stat-card.green { background: linear-gradient(135deg, #059669, #10b981); }
+        .stat-card.purple { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+        .stat-card.orange { background: linear-gradient(135deg, #ea580c, #f97316); }
+        .stat-value { font-size: 2rem; font-weight: 700; }
+        .stat-label { opacity: 0.9; font-size: 0.875rem; margin-top: 0.25rem; }
+        .toggle-switch { position: relative; display: inline-block; width: 60px; height: 30px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: #cbd5e1; border-radius: 30px; transition: 0.3s; }
+        .toggle-slider:before { position: absolute; content: ''; height: 22px; width: 22px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: 0.3s; }
+        input:checked + .toggle-slider { background: #059669; }
+        input:checked + .toggle-slider:before { transform: translateX(30px); }
+        .login-overlay { position: fixed; inset: 0; background: linear-gradient(135deg, #0369a1, #059669); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-box { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
+        .login-box h2 { text-align: center; color: #0369a1; margin-bottom: 1.5rem; }
+        .hidden { display: none !important; }
+        .tab-buttons { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .tab-btn { padding: 0.75rem 1.5rem; border: 2px solid #0369a1; background: white; color: #0369a1; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .tab-btn.active { background: #0369a1; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <h2>🔐 SuperAdmin Login</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-control" id="adminUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="adminPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem; color: #6b7280;">
+                <a href="index.html">← Back to Portal</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>🔑 Change Password</h2>
+                <button class="modal-close" onclick="closePasswordModal()">×</button>
+            </div>
+            <form id="changePasswordForm">
+                <div class="form-group" id="currentPassGroup">
+                    <label>Current Password</label>
+                    <input type="password" class="form-control" id="currentPassword">
+                </div>
+                <div class="form-group">
+                    <label>New Password (min 6 characters)</label>
+                    <input type="password" class="form-control" id="newPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Change Password</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainDashboard" class="hidden">
+        <header class="header">
+            <div class="container">
+                <nav class="nav">
+                    <div class="logo">🔧 SuperAdmin Panel</div>
+                    <ul class="nav-links">
+                        <li><a href="index.html">View Portal</a></li>
+                        <li><a href="#" onclick="showPasswordModal()">Change Password</a></li>
+                        <li><a href="#" id="logoutBtn">Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main class="admin-container">
+            <h1 style="color: #0369a1; margin-bottom: 0.5rem;">⚙️ System Configuration</h1>
+            <p style="color: #6b7280; margin-bottom: 2rem;">Healthcare & Academicians AI Job Portal - by BusinessHR</p>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalUsers">-</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-value" id="totalEmployers">-</div>
+                    <div class="stat-label">Employers</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-value" id="totalJobseekers">-</div>
+                    <div class="stat-label">Job Seekers</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-value" id="totalJobs">-</div>
+                    <div class="stat-label">Active Jobs</div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="tokens">💰 Token Settings</button>
+                <button class="tab-btn" data-tab="payment">💳 Payment Settings</button>
+                <button class="tab-btn" data-tab="database">🗄️ Database Settings</button>
+                <button class="tab-btn" data-tab="site">🌐 Site Settings</button>
+            </div>
+
+            <!-- Token Settings -->
+            <div id="tokensTab" class="tab-content active">
+                <div class="config-section">
+                    <h3><span class="section-icon">🤖</span> AI Search Token Costs</h3>
+                    <p style="color: #6b7280; margin-bottom: 1rem;">Tokens deducted when employer uses AI-powered search</p>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Search Cost</label>
+                            <input type="number" id="aiSearchCost" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Unmask Email Cost</label>
+                            <input type="number" id="aiUnmaskEmailCost" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Unmask Mobile Cost</label>
+                            <input type="number" id="aiUnmaskMobileCost" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Download Profile Cost</label>
+                            <input type="number" id="aiDownloadCost" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3><span class="section-icon">🔍</span> Normal Search Token Costs</h3>
+                    <p style="color: #6b7280; margin-bottom: 1rem;">Tokens deducted when employer uses basic keyword search</p>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Search Cost</label>
+                            <input type="number" id="normalSearchCost" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Unmask Email Cost</label>
+                            <input type="number" id="normalUnmaskEmailCost" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Unmask Mobile Cost</label>
+                            <input type="number" id="normalUnmaskMobileCost" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Download Profile Cost</label>
+                            <input type="number" id="normalDownloadCost" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3><span class="section-icon">🎁</span> Initial Tokens & Free Tier</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Initial Tokens for New Employers</label>
+                            <input type="number" id="initialTokens" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Free Daily Searches</label>
+                            <input type="number" id="freeDailySearches" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Free Daily Unmasks</label>
+                            <input type="number" id="freeDailyUnmasks" min="0">
+                        </div>
+                        <div class="config-item">
+                            <label>Free Tier Enabled</label>
+                            <label class="toggle-switch" style="margin-top: 0.5rem;">
+                                <input type="checkbox" id="freeTierEnabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="save-btn" onclick="saveTokenSettings()">💾 Save Token Settings</button>
+            </div>
+
+            <!-- Payment Settings -->
+            <div id="paymentTab" class="tab-content">
+                <div class="config-section">
+                    <h3><span class="section-icon">💳</span> Razorpay Configuration</h3>
+                    <p style="color: #6b7280; margin-bottom: 1rem;">Configure your Razorpay payment gateway credentials</p>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Razorpay Key ID</label>
+                            <input type="text" id="razorpayKeyId" placeholder="rzp_live_xxx">
+                        </div>
+                        <div class="config-item">
+                            <label>Razorpay Key Secret</label>
+                            <input type="password" id="razorpayKeySecret" placeholder="••••••••">
+                        </div>
+                        <div class="config-item" style="grid-column: 1 / -1;">
+                            <label>Webhook Secret</label>
+                            <input type="password" id="razorpayWebhookSecret" placeholder="••••••••">
+                        </div>
+                    </div>
+                </div>
+                <button class="save-btn" onclick="savePaymentSettings()">💾 Save Payment Settings</button>
+            </div>
+
+            <!-- Database Settings -->
+            <div id="databaseTab" class="tab-content">
+                <div class="config-section danger-zone">
+                    <h3><span class="section-icon">⚠️</span> Database Configuration</h3>
+                    <p style="color: #991b1b; margin-bottom: 1rem;">Warning: Incorrect settings can break the application!</p>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Database Host</label>
+                            <input type="text" id="dbHost">
+                        </div>
+                        <div class="config-item">
+                            <label>Database Name</label>
+                            <input type="text" id="dbName">
+                        </div>
+                        <div class="config-item">
+                            <label>Database User</label>
+                            <input type="text" id="dbUser">
+                        </div>
+                        <div class="config-item">
+                            <label>Database Password</label>
+                            <input type="password" id="dbPass">
+                            <button class="test-btn" onclick="testDbConnection()" style="margin-top: 0.5rem;">🔌 Test Connection</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="save-btn" onclick="saveDatabaseSettings()">💾 Save Database Settings</button>
+            </div>
+
+            <!-- Site Settings -->
+            <div id="siteTab" class="tab-content">
+                <div class="config-section">
+                    <h3><span class="section-icon">🌐</span> Site Configuration</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Site Name</label>
+                            <input type="text" id="siteName">
+                        </div>
+                        <div class="config-item">
+                            <label>Tagline</label>
+                            <input type="text" id="siteTagline">
+                        </div>
+                        <div class="config-item">
+                            <label>AI Search Globally Enabled</label>
+                            <label class="toggle-switch" style="margin-top: 0.5rem;">
+                                <input type="checkbox" id="aiSearchEnabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3><span class="section-icon">🔑</span> API Configuration</h3>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>Internal API Key</label>
+                            <input type="text" id="apiKey">
+                        </div>
+                        <div class="config-item">
+                            <label>HuggingFace Token</label>
+                            <input type="password" id="hfToken">
+                        </div>
+                    </div>
+                </div>
+                <button class="save-btn" onclick="saveSiteSettings()">💾 Save Site Settings</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        const API_BASE = 'api/';
+        let isFirstLogin = false;
+
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+            });
+        });
+
+        // Admin API calls
+        async function adminApi(endpoint, options = {}) {
+            const res = await fetch(API_BASE + endpoint, {
+                ...options,
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json', ...options.headers }
+            });
+            return res.json();
+        }
+
+        // Check if logged in
+        async function checkAdminAuth() {
+            try {
+                const res = await adminApi('admin_auth.php?action=me');
+                if (res.success) {
+                    isFirstLogin = res.admin.first_login;
+                    showDashboard();
+                    if (isFirstLogin) {
+                        ui.showAlert('Welcome! Please change your password for security.', 'warning', 8000);
+                        showPasswordModal();
+                    }
+                }
+            } catch (e) {
+                // Not logged in
+            }
+        }
+
+        // Login
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            try {
+                const res = await adminApi('admin_auth.php?action=login', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (res.success) {
+                    isFirstLogin = res.first_login;
+                    ui.showAlert('Login successful!', 'success');
+                    showDashboard();
+                    if (isFirstLogin) {
+                        setTimeout(() => {
+                            ui.showAlert('Please change your default password!', 'warning', 8000);
+                            showPasswordModal();
+                        }, 1000);
+                    }
+                } else {
+                    ui.showAlert(res.error || 'Login failed', 'error');
+                }
+            } catch (e) {
+                ui.showAlert('Login failed', 'error');
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await adminApi('admin_auth.php?action=logout', { method: 'POST' });
+            location.reload();
+        });
+
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            loadConfig();
+            loadStats();
+        }
+
+        // Load configuration
+        async function loadConfig() {
+            try {
+                const res = await adminApi('admin_auth.php?action=get-config');
+                if (res.success) {
+                    const c = res.config;
+                    
+                    // AI Token costs
+                    document.getElementById('aiSearchCost').value = c.token_costs_ai?.search || 150;
+                    document.getElementById('aiUnmaskEmailCost').value = c.token_costs_ai?.unmask_email || 25;
+                    document.getElementById('aiUnmaskMobileCost').value = c.token_costs_ai?.unmask_mobile || 50;
+                    document.getElementById('aiDownloadCost').value = c.token_costs_ai?.download_profile || 100;
+                    
+                    // Normal Token costs
+                    document.getElementById('normalSearchCost').value = c.token_costs_normal?.search || 50;
+                    document.getElementById('normalUnmaskEmailCost').value = c.token_costs_normal?.unmask_email || 15;
+                    document.getElementById('normalUnmaskMobileCost').value = c.token_costs_normal?.unmask_mobile || 30;
+                    document.getElementById('normalDownloadCost').value = c.token_costs_normal?.download_profile || 75;
+                    
+                    // Free tier
+                    document.getElementById('initialTokens').value = c.initial_tokens || 1000;
+                    document.getElementById('freeDailySearches').value = c.free_tier?.daily_searches || 5;
+                    document.getElementById('freeDailyUnmasks').value = c.free_tier?.daily_unmasks || 3;
+                    document.getElementById('freeTierEnabled').checked = c.free_tier?.enabled !== false;
+                    
+                    // Razorpay
+                    document.getElementById('razorpayKeyId').value = c.razorpay?.key_id || '';
+                    document.getElementById('razorpayKeySecret').value = c.razorpay?.key_secret || '';
+                    document.getElementById('razorpayWebhookSecret').value = c.razorpay?.webhook_secret || '';
+                    
+                    // Database
+                    document.getElementById('dbHost').value = c.db?.host || '';
+                    document.getElementById('dbName').value = c.db?.name || '';
+                    document.getElementById('dbUser').value = c.db?.user || '';
+                    document.getElementById('dbPass').value = c.db?.pass || '';
+                    
+                    // Site
+                    document.getElementById('siteName').value = c.site?.name || '';
+                    document.getElementById('siteTagline').value = c.site?.tagline || '';
+                    document.getElementById('aiSearchEnabled').checked = c.site?.ai_search_enabled !== false;
+                    document.getElementById('apiKey').value = c.api_key || '';
+                    document.getElementById('hfToken').value = c.hf_token || '';
+                }
+            } catch (e) {
+                ui.showAlert('Failed to load configuration', 'error');
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const res = await adminApi('admin_stats.php?action=summary');
+                if (res.success) {
+                    document.getElementById('totalUsers').textContent = res.total_users || 0;
+                    document.getElementById('totalEmployers').textContent = res.employers || 0;
+                    document.getElementById('totalJobseekers').textContent = res.jobseekers || 0;
+                    document.getElementById('totalJobs').textContent = res.active_jobs || 0;
+                }
+            } catch (e) {
+                // Stats not critical
+            }
+        }
+
+        // Save functions
+        async function saveTokenSettings() {
+            const data = {
+                token_costs_ai: {
+                    search: parseInt(document.getElementById('aiSearchCost').value) || 150,
+                    unmask_email: parseInt(document.getElementById('aiUnmaskEmailCost').value) || 25,
+                    unmask_mobile: parseInt(document.getElementById('aiUnmaskMobileCost').value) || 50,
+                    download_profile: parseInt(document.getElementById('aiDownloadCost').value) || 100
+                },
+                token_costs_normal: {
+                    search: parseInt(document.getElementById('normalSearchCost').value) || 50,
+                    unmask_email: parseInt(document.getElementById('normalUnmaskEmailCost').value) || 15,
+                    unmask_mobile: parseInt(document.getElementById('normalUnmaskMobileCost').value) || 30,
+                    download_profile: parseInt(document.getElementById('normalDownloadCost').value) || 75
+                },
+                initial_tokens: parseInt(document.getElementById('initialTokens').value) || 1000,
+                free_tier: {
+                    enabled: document.getElementById('freeTierEnabled').checked,
+                    daily_searches: parseInt(document.getElementById('freeDailySearches').value) || 5,
+                    daily_unmasks: parseInt(document.getElementById('freeDailyUnmasks').value) || 3
+                }
+            };
+            await saveConfig(data, 'Token settings saved!');
+        }
+
+        async function savePaymentSettings() {
+            const data = {
+                razorpay: {
+                    key_id: document.getElementById('razorpayKeyId').value,
+                    key_secret: document.getElementById('razorpayKeySecret').value,
+                    webhook_secret: document.getElementById('razorpayWebhookSecret').value
+                }
+            };
+            await saveConfig(data, 'Payment settings saved!');
+        }
+
+        async function saveDatabaseSettings() {
+            const data = {
+                db: {
+                    host: document.getElementById('dbHost').value,
+                    name: document.getElementById('dbName').value,
+                    user: document.getElementById('dbUser').value,
+                    pass: document.getElementById('dbPass').value,
+                    charset: 'utf8mb4'
+                }
+            };
+            await saveConfig(data, 'Database settings saved!');
+        }
+
+        async function saveSiteSettings() {
+            const data = {
+                site: {
+                    name: document.getElementById('siteName').value,
+                    tagline: document.getElementById('siteTagline').value,
+                    ai_search_enabled: document.getElementById('aiSearchEnabled').checked
+                },
+                api_key: document.getElementById('apiKey').value,
+                hf_token: document.getElementById('hfToken').value
+            };
+            await saveConfig(data, 'Site settings saved!');
+        }
+
+        async function saveConfig(data, successMsg) {
+            ui.showLoading('Saving...');
+            try {
+                const res = await adminApi('admin_auth.php?action=update-all', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                ui.hideLoading();
+                if (res.success) {
+                    ui.showAlert(successMsg, 'success');
+                } else {
+                    ui.showAlert(res.error || 'Save failed', 'error');
+                }
+            } catch (e) {
+                ui.hideLoading();
+                ui.showAlert('Save failed', 'error');
+            }
+        }
+
+        async function testDbConnection() {
+            ui.showLoading('Testing connection...');
+            try {
+                const res = await adminApi('admin_auth.php?action=test-db', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        host: document.getElementById('dbHost').value,
+                        name: document.getElementById('dbName').value,
+                        user: document.getElementById('dbUser').value,
+                        pass: document.getElementById('dbPass').value
+                    })
+                });
+                ui.hideLoading();
+                if (res.success) {
+                    ui.showAlert('✅ Database connection successful!', 'success');
+                } else {
+                    ui.showAlert('❌ ' + (res.error || 'Connection failed'), 'error');
+                }
+            } catch (e) {
+                ui.hideLoading();
+                ui.showAlert('Connection test failed', 'error');
+            }
+        }
+
+        // Password modal
+        function showPasswordModal() {
+            document.getElementById('changePasswordModal').classList.add('active');
+            if (isFirstLogin) {
+                document.getElementById('currentPassGroup').style.display = 'none';
+            } else {
+                document.getElementById('currentPassGroup').style.display = 'block';
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('changePasswordModal').classList.remove('active');
+        }
+
+        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            const currentPass = document.getElementById('currentPassword').value;
+
+            if (newPass !== confirmPass) {
+                ui.showAlert('Passwords do not match', 'error');
+                return;
+            }
+
+            try {
+                const res = await adminApi('admin_auth.php?action=change-password', {
+                    method: 'POST',
+                    body: JSON.stringify({ current_password: currentPass, new_password: newPass })
+                });
+
+                if (res.success) {
+                    ui.showAlert('Password changed successfully!', 'success');
+                    closePasswordModal();
+                    isFirstLogin = false;
+                } else {
+                    ui.showAlert(res.error || 'Failed to change password', 'error');
+                }
+            } catch (e) {
+                ui.showAlert('Failed to change password', 'error');
+            }
+        });
+
+        // Initialize
+        checkAdminAuth();
+    </script>
+</body>
+</html>

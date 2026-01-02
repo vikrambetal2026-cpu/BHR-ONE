@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Seeker Dashboard</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <div class="logo">JobPortal</div>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#" id="logoutBtn">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding: 2rem 0;">
+    <div class="grid grid-2">
+      <div class="card">
+        <h2>Job Seeker</h2>
+        <p id="meLine" style="margin-top: .5rem;"></p>
+      </div>
+      <div class="card">
+        <h2>Find Jobs</h2>
+        <form id="filterForm" class="grid" style="gap:.75rem; margin-top:1rem;">
+          <input class="form-input" name="q" placeholder="Keyword (title/skills)" />
+          <input class="form-input" name="location" placeholder="Location" />
+          <button class="btn btn-primary">Search</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem;">
+      <h2>Job Listings</h2>
+      <div id="jobList" style="margin-top: 1rem;"></div>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem;">
+      <h2>My Applications</h2>
+      <button class="btn btn-secondary" id="refreshAppsBtn" style="margin-top: .75rem;">Refresh</button>
+      <div id="myApplications" style="margin-top: 1rem;"></div>
+    </div>
+  </main>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/jobseeker-dashboard.js"></script>
+</body>
+</html>

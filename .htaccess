@@ -1,0 +1,52 @@
+# Enable Rewrite Engine
+RewriteEngine On
+
+# -----------------------------------------------------------------------------
+# FORCE HTTP (per project requirement)
+# - Prevent accidental HTTPS access (invalid SSL / mixed-content breaks the app)
+# - Works for direct HTTPS and for proxy/CDN SSL termination (X-Forwarded-Proto)
+# -----------------------------------------------------------------------------
+RewriteCond %{HTTPS} on [OR]
+RewriteCond %{HTTP:X-Forwarded-Proto} =https
+RewriteRule ^ http://%{HTTP_HOST}%{REQUEST_URI} [L,R=302]
+
+# API Routes - Direct to PHP files
+RewriteRule ^api/(.*)$ api/$1 [L,QSA]
+
+# Redirect www to non-www (optional)
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
+# Default document
+DirectoryIndex index.html index.php
+
+# Prevent directory listing
+Options -Indexes
+
+# Error pages (optional)
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# PHP settings (if allowed)
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# CORS for API (if needed)
+<FilesMatch "\.(php)$">
+    <IfModule mod_headers.c>
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+    </IfModule>
+</FilesMatch>

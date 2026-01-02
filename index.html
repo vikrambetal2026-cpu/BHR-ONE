@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Job Portal - FREE Job Search for Healthcare Professionals & Doctors</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">🏥 HealthCare Jobs</div>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#" onclick="showLoginModal()">Login</a></li>
+                    <li><a href="#" onclick="showRegisterModal()" class="btn btn-primary btn-sm">Get Started FREE</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge">🩺 100% FREE for Healthcare Professionals</div>
+            <h1>Find Your Perfect Healthcare Opportunity</h1>
+            <p>Connecting Healthcare Professionals, Doctors & Medical Institutions</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="showRegisterModal('employer')">🏥 I'm Hiring</button>
+                <button class="btn btn-outline" onclick="showRegisterModal('jobseeker')">👨‍⚕️ Find Healthcare Jobs</button>
+            </div>
+            <p class="hero-subtitle">✨ FREE for Doctors, Nurses, Healthcare Staff & Academicians ✨</p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" style="padding: 4rem 0; background: white;">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 1rem; font-size: 2rem; color: #0369a1;">Platform Features</h2>
+            <p style="text-align: center; color: #059669; font-weight: 600; margin-bottom: 3rem;">FREE Access for Healthcare Professionals & Medical Institutions</p>
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3 style="color: #0369a1; margin-bottom: 1rem;">🏥 For Healthcare Employers</h3>
+                    <ul style="list-style: none; line-height: 2;">
+                        <li>✅ Post unlimited jobs (FREE)</li>
+                        <li>✅ AI-powered candidate search</li>
+                        <li>✅ Access healthcare professionals database</li>
+                        <li>✅ Smart contact system</li>
+                        <li>✅ Application tracking dashboard</li>
+                        <li>✅ Find doctors, nurses & specialists</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="color: #059669; margin-bottom: 1rem;">👨‍⚕️ For Healthcare Professionals</h3>
+                    <ul style="list-style: none; line-height: 2;">
+                        <li>✅ Browse unlimited healthcare jobs</li>
+                        <li>✅ Apply instantly to hospitals & clinics</li>
+                        <li>✅ Track all your applications</li>
+                        <li>✅ Direct employer contact</li>
+                        <li>✅ 100% FREE - No hidden charges</li>
+                        <li>✅ For Doctors, Nurses, Staff & Academicians</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login</h2>
+                <button class="modal-close" onclick="closeModal('loginModal')">×</button>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                <p class="text-center mt-2">
+                    Don't have an account? <a href="#" onclick="switchToRegister()">Register here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Account</h2>
+                <button class="modal-close" onclick="closeModal('registerModal')">×</button>
+            </div>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>I am a:</label>
+                    <select class="form-control" id="registerRole" required onchange="toggleCompanyField()">
+                        <option value="">Select Role</option>
+                        <option value="employer">Employer</option>
+                        <option value="jobseeker">Job Seeker</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" id="registerName" required>
+                </div>
+                <div class="form-group" id="companyFieldGroup" style="display: none;">
+                    <label>Company Name</label>
+                    <input type="text" class="form-control" id="registerCompany">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone (Optional)</label>
+                    <input type="tel" class="form-control" id="registerPhone">
+                </div>
+                <div class="form-group">
+                    <label>Password (min 6 characters)</label>
+                    <input type="password" class="form-control" id="registerPassword" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                <p class="text-center mt-2">
+                    Already have an account? <a href="#" onclick="switchToLogin()">Login here</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // Modal functions
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function showRegisterModal(role = '') {
+            document.getElementById('registerModal').classList.add('active');
+            if (role) {
+                document.getElementById('registerRole').value = role;
+                toggleCompanyField();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function switchToRegister() {
+            closeModal('loginModal');
+            showRegisterModal();
+        }
+
+        function switchToLogin() {
+            closeModal('registerModal');
+            showLoginModal();
+        }
+
+        function toggleCompanyField() {
+            const role = document.getElementById('registerRole').value;
+            const companyField = document.getElementById('companyFieldGroup');
+            companyField.style.display = role === 'employer' ? 'block' : 'none';
+        }
+
+        // Handle login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await api.auth.login({ email, password });
+                
+                if (response.success) {
+                    ui.showAlert('Login successful!', 'success');
+
+                    const role = String(response.user.role || '').toLowerCase().trim();
+                    const isEmployer = (role === 'employer' || role === 'company' || role === 'recruiter' || role === 'hr');
+                    
+                    // Redirect based on role
+                    setTimeout(() => {
+                        if (isEmployer) {
+                            window.location.href = 'employer-dashboard.html';
+                        } else {
+                            window.location.href = 'jobseeker-dashboard.html';
+                        }
+                    }, 1000);
+                }
+            } catch (error) {
+                ui.showAlert(error.message || 'Login failed', 'error');
+            }
+        }
+
+        // Handle registration
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            const userData = {
+                role: document.getElementById('registerRole').value,
+                full_name: document.getElementById('registerName').value,
+                company_name: document.getElementById('registerCompany').value,
+                email: document.getElementById('registerEmail').value,
+                phone: document.getElementById('registerPhone').value,
+                password: document.getElementById('registerPassword').value
+            };
+
+            try {
+                const response = await api.auth.register(userData);
+                
+                if (response.success) {
+                    ui.showAlert('Registration successful! Redirecting...', 'success');
+
+                    const role = String(response.user.role || '').toLowerCase().trim();
+                    const isEmployer = (role === 'employer' || role === 'company' || role === 'recruiter' || role === 'hr');
+                    
+                    // Redirect based on role
+                    setTimeout(() => {
+                        if (isEmployer) {
+                            window.location.href = 'employer-dashboard.html';
+                        } else {
+                            window.location.href = 'jobseeker-dashboard.html';
+                        }
+                    }, 1000);
+                }
+            } catch (error) {
+                ui.showAlert(error.message || 'Registration failed', 'error');
+            }
+        }
+
+        // Close modal on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Check if already logged in
+        (async function() {
+            try {
+                const response = await api.auth.getCurrentUser();
+                if (response.success) {
+                    // Already logged in, redirect to dashboard
+                    const role = String(response.user.role || '').toLowerCase().trim();
+                    const isEmployer = (role === 'employer' || role === 'company' || role === 'recruiter' || role === 'hr');
+                    if (isEmployer) {
+                        window.location.href = 'employer-dashboard.html';
+                    } else {
+                        window.location.href = 'jobseeker-dashboard.html';
+                    }
+                }
+            } catch (error) {
+                // Not logged in, stay on landing page
+            }
+        })();
+    </script>
+
+    <!-- Footer -->
+    <footer style="background: #1f2937; color: white; padding: 2rem 0; margin-top: 4rem; text-align: center;">
+        <div class="container">
+            <p style="margin-bottom: 0.5rem;">&copy; 2026 Healthcare Job Portal - by BusinessHR</p>
+            <p style="font-size: 0.875rem; opacity: 0.7;">
+                <a href="admin-dashboard.html" style="color: #94a3b8; text-decoration: none;">⚙️ Admin Panel</a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
